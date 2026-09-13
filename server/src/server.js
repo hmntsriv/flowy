@@ -38,6 +38,13 @@ app.get("/", (req, res) => {
   res.send("Flowy API is running 🚀");
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "flowy-backend",
+  });
+});
+
 const startServer = async () => {
   await connectDB();
 
