@@ -12,6 +12,21 @@
   --color-success: #35a76f;
   --color-danger: #d95c5c;
 
+  --surface: #ffffff;
+  --surface-hover: #f4f6fa;
+
+  --border-color: rgba(17, 24, 39, 0.1);
+  --border: var(--border-color);
+
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+
+  --accent-color: var(--color-accent);
+  --accent: var(--color-accent);
+
+  --hover-bg: rgba(17, 24, 39, 0.05);
+  --glass-bg: var(--glass-background);
+
   /* Glass */
   --glass-background: rgba(255, 255, 255, 0.52);
   --glass-background-strong: rgba(255, 255, 255, 0.68);
@@ -63,6 +78,19 @@
 
   --glass-border: rgba(255, 255, 255, 0.09);
 
-  --glass-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.25);
+  --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  --surface: #1e2430;
+  --surface-hover: #252d3a;
+
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border: var(--border-color);
+
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+
+  --accent-color: var(--color-accent);
+  --accent: var(--color-accent);
+
+  --hover-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg: var(--glass-background);`
 }

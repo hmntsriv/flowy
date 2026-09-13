@@ -1551,8 +1551,7 @@
   box-sizing: border-box;
   transform: translate(-50%, -50%);
 
-  background: rgba(35, 45, 64, 0.58);
-
+  background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 18px;
 
@@ -2868,5 +2867,16 @@
 
   .auth-heading h1 {
     font-size: 22px;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar-panel.mobile-sidebar-open {
+    background: rgba(24, 30, 42, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  [data-theme="light"] .sidebar-panel.mobile-sidebar-open {
+    background: rgba(248, 250, 252, 0.96);
   }
 }

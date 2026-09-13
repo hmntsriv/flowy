@@ -1,4 +1,5 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import socket from "../services/socket";
 
 export const AuthContext = createContext();
 
@@ -15,6 +16,28 @@ export function AuthProvider({ children }) {
       : null;
   });
 
+  useEffect(() => {
+    if (!token) {
+      if (socket.connected) {
+        socket.disconnect();
+      }
+
+      return;
+    }
+
+    socket.auth = {
+      token,
+    };
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    return () => {
+      socket.off("connect");
+    };
+  }, [token]);
+
   const login = (newToken, newUser) => {
     localStorage.setItem("token", newToken);
 
@@ -30,6 +53,8 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    socket.disconnect();
+
     localStorage.removeItem("token");
     localStorage.removeItem("flowy-user");
 
