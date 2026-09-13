@@ -13,23 +13,11 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://flow-sandy.vercel.app",
-];
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS blocked origin: ${origin}`));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: true,
+  }),
+);
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -56,7 +44,9 @@ const startServer = async () => {
   const server = http.createServer(app);
 
   const io = new Server(server, {
-    cors: corsOptions,
+    cors: {
+      origin: true,
+    },
   });
 
   io.on("connection", (socket) => {
