@@ -3,7 +3,7 @@
   <h1>Flowy</h1>
   <p>A modern full-stack notes app for writing, drawing, organizing, and syncing ideas.</p>
   <p>
-    <a href="https://flow-sandy.vercel.app/"><strong>Live Demo</strong></a>
+    <a href="https://flowy-sandy.vercel.app/"><strong>Live Demo</strong></a>
     &nbsp;·&nbsp;
     <a href="https://github.com/hmntsriv/flowy"><strong>Source Code</strong></a>
   </p>
@@ -25,7 +25,7 @@ It combines text notes and canvas notes with JWT authentication, autosave, starr
 
 The frontend and backend are deployed independently:
 
-- **Frontend:** Vercel — https://flow-sandy.vercel.app/
+- **Frontend:** Vercel — https://flowy-sandy.vercel.app/
 - **Backend:** Render — https://flowy-backend-g7e4.onrender.com/
 
 ## Features
