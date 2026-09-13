@@ -18,12 +18,18 @@ const allowedOrigins = [
   "https://flow-sandy.vercel.app",
 ];
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  }),
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked origin: ${origin}`));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -50,10 +56,7 @@ const startServer = async () => {
   const server = http.createServer(app);
 
   const io = new Server(server, {
-    cors: {
-      origin: allowedOrigins,
-      credentials: true,
-    },
+    cors: corsOptions,
   });
 
   io.on("connection", (socket) => {
