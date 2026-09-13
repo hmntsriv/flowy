@@ -1,4 +1,4 @@
-const Note = require("../models/Note");
+const Note = require("../models/note");
 
 // @desc    Get all notes for logged-in user
 // @route   GET /api/notes
