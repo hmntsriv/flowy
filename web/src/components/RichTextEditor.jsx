@@ -9,13 +9,33 @@ import {
   Quote,
 } from "lucide-react";
 
-function RichTextEditor({ value, onChange, noteId }) {
+function RichTextEditor({
+  value,
+  onChange,
+  noteId,
+}) {
   const editorRef = useRef(null);
+
   const initializedNoteRef = useRef(null);
 
+  /*
+   * Value most recently produced by this editor
+   * through a local user action.
+   *
+   * This prevents React state updates caused by
+   * our own typing from rewriting the contentEditable
+   * DOM and moving the cursor.
+   */
+  const lastLocalValueRef = useRef("");
+
   const normalizeLegacyContent = (content) => {
-    if (!content) return "";
-    if (/<[a-z][\s\S]*>/i.test(content)) return content;
+    if (!content) {
+      return "";
+    }
+
+    if (/<[a-z][\s\S]*>/i.test(content)) {
+      return content;
+    }
 
     const escaped = content
       .replace(/&/g, "&amp;")
@@ -28,29 +48,90 @@ function RichTextEditor({ value, onChange, noteId }) {
       .join("<br>");
   };
 
+  /*
+   * Initialize a newly selected note.
+   */
   useEffect(() => {
     const editor = editorRef.current;
-    if (!editor || !noteId || initializedNoteRef.current === noteId) {
+
+    if (!editor || !noteId) {
       return;
     }
 
-    editor.innerHTML = normalizeLegacyContent(value);
-    initializedNoteRef.current = noteId;
+    const normalizedValue =
+      normalizeLegacyContent(value);
+
+    /*
+     * Different note:
+     * completely replace the editor contents.
+     */
+    if (
+      initializedNoteRef.current !== noteId
+    ) {
+      editor.innerHTML = normalizedValue;
+
+      initializedNoteRef.current = noteId;
+
+      lastLocalValueRef.current =
+        value || "";
+
+      return;
+    }
+
+    /*
+     * Same note:
+     *
+     * If the incoming React value is different
+     * from the value last produced locally,
+     * this is an external update.
+     *
+     * That includes Socket.IO updates.
+     */
+    if (
+      (value || "") !==
+      lastLocalValueRef.current
+    ) {
+      /*
+       * Don't unnecessarily touch the DOM.
+       */
+      if (
+        editor.innerHTML !==
+        normalizedValue
+      ) {
+        editor.innerHTML =
+          normalizedValue;
+      }
+
+      lastLocalValueRef.current =
+        value || "";
+    }
   }, [noteId, value]);
 
   const serialize = () => {
-    const editor = editorRef.current;
-    if (!editor) return "";
+    const editor =
+      editorRef.current;
 
-    const clone = editor.cloneNode(true);
+    if (!editor) {
+      return "";
+    }
+
+    const clone =
+      editor.cloneNode(true);
 
     clone
-      .querySelectorAll('input[type="checkbox"]')
+      .querySelectorAll(
+        'input[type="checkbox"]',
+      )
       .forEach((checkbox) => {
         if (checkbox.checked) {
-          checkbox.setAttribute("checked", "checked");
+          checkbox.setAttribute(
+            "checked",
+            "checked",
+          );
         } else {
-          checkbox.removeAttribute("checked");
+          checkbox.removeAttribute(
+            "checked",
+          );
         }
       });
 
@@ -58,40 +139,83 @@ function RichTextEditor({ value, onChange, noteId }) {
   };
 
   const emitChange = () => {
-    onChange(serialize());
+    const nextValue = serialize();
+
+    /*
+     * Mark this value as locally generated.
+     */
+    lastLocalValueRef.current =
+      nextValue;
+
+    onChange(nextValue);
   };
 
-  const runCommand = (command, commandValue = null) => {
+  const runCommand = (
+    command,
+    commandValue = null,
+  ) => {
     editorRef.current?.focus();
-    document.execCommand(command, false, commandValue);
+
+    document.execCommand(
+      command,
+      false,
+      commandValue,
+    );
+
     emitChange();
   };
 
   const toggleBlockquote = () => {
-    const editor = editorRef.current;
-    if (!editor) return;
+    const editor =
+      editorRef.current;
 
-    editor.focus();
-
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
+    if (!editor) {
       return;
     }
 
-    let node = selection.anchorNode;
+    editor.focus();
 
-    if (node?.nodeType === Node.TEXT_NODE) {
-      node = node.parentElement;
+    const selection =
+      window.getSelection();
+
+    if (
+      !selection ||
+      selection.rangeCount === 0
+    ) {
+      return;
     }
 
-    const blockquote = node?.closest?.("blockquote");
+    let node =
+      selection.anchorNode;
 
-    if (blockquote && editor.contains(blockquote)) {
-      // Toggle the current block back to a normal paragraph.
-      document.execCommand("formatBlock", false, "p");
+    if (
+      node?.nodeType ===
+      Node.TEXT_NODE
+    ) {
+      node =
+        node.parentElement;
+    }
+
+    const blockquote =
+      node?.closest?.(
+        "blockquote",
+      );
+
+    if (
+      blockquote &&
+      editor.contains(blockquote)
+    ) {
+      document.execCommand(
+        "formatBlock",
+        false,
+        "p",
+      );
     } else {
-      // Turn the current block into a quote.
-      document.execCommand("formatBlock", false, "blockquote");
+      document.execCommand(
+        "formatBlock",
+        false,
+        "blockquote",
+      );
     }
 
     emitChange();
@@ -99,17 +223,28 @@ function RichTextEditor({ value, onChange, noteId }) {
 
   const insertChecklist = () => {
     editorRef.current?.focus();
+
     document.execCommand(
       "insertHTML",
       false,
-      '<div class="rich-checklist-item"><input type="checkbox"><span>Checklist item</span></div>'
+      '<div class="rich-checklist-item">' +
+        '<input type="checkbox">' +
+        "<span>Checklist item</span>" +
+      "</div>",
     );
+
     emitChange();
   };
 
   const handleClick = (event) => {
-    if (event.target.matches('input[type="checkbox"]')) {
-      requestAnimationFrame(emitChange);
+    if (
+      event.target.matches(
+        'input[type="checkbox"]',
+      )
+    ) {
+      requestAnimationFrame(
+        emitChange,
+      );
     }
   };
 
@@ -123,8 +258,12 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => runCommand("bold")}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={() =>
+            runCommand("bold")
+          }
           title="Bold"
           aria-label="Bold"
         >
@@ -134,8 +273,12 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => runCommand("italic")}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={() =>
+            runCommand("italic")
+          }
           title="Italic"
           aria-label="Italic"
         >
@@ -147,8 +290,14 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => runCommand("insertUnorderedList")}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={() =>
+            runCommand(
+              "insertUnorderedList",
+            )
+          }
           title="Bulleted list"
           aria-label="Bulleted list"
         >
@@ -158,8 +307,14 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => runCommand("insertOrderedList")}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={() =>
+            runCommand(
+              "insertOrderedList",
+            )
+          }
           title="Numbered list"
           aria-label="Numbered list"
         >
@@ -169,8 +324,12 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={insertChecklist}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={
+            insertChecklist
+          }
           title="Checklist"
           aria-label="Checklist"
         >
@@ -182,8 +341,12 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={toggleBlockquote}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={
+            toggleBlockquote
+          }
           title="Quote"
           aria-label="Quote"
         >
@@ -193,8 +356,15 @@ function RichTextEditor({ value, onChange, noteId }) {
         <button
           type="button"
           className="rich-editor-tool"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => runCommand("formatBlock", "pre")}
+          onMouseDown={(event) =>
+            event.preventDefault()
+          }
+          onClick={() =>
+            runCommand(
+              "formatBlock",
+              "pre",
+            )
+          }
           title="Code block"
           aria-label="Code block"
         >
