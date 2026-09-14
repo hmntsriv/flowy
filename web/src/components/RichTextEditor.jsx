@@ -1,20 +1,12 @@
 import { useEffect, useRef } from "react";
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  CheckSquare,
-  Code,
-  Quote,
-} from "lucide-react";
+import { Bold, Italic, List, ListOrdered, CheckSquare, Code, Quote } from "lucide-react";
 
 function RichTextEditor({ value, onChange, noteId }) {
   const editorRef = useRef(null);
+  const initializedNoteRef = useRef(null);
 
   const normalizeLegacyContent = (content) => {
     if (!content) return "";
-
     if (/<[a-z][\s\S]*>/i.test(content)) return content;
 
     const escaped = content
@@ -22,33 +14,26 @@ function RichTextEditor({ value, onChange, noteId }) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    return escaped
-      .split("\n")
-      .map((line) => line || "<br>")
-      .join("<br>");
+    return escaped.split("\n").map((line) => line || "<br>").join("<br>");
   };
 
   useEffect(() => {
     const editor = editorRef.current;
-    if (!editor || !noteId) return;
+    if (!editor || !noteId || initializedNoteRef.current === noteId) return;
 
     editor.innerHTML = normalizeLegacyContent(value);
-  }, [noteId]);
+    initializedNoteRef.current = noteId;
+  }, [noteId, value]);
 
   const serialize = () => {
     const editor = editorRef.current;
     if (!editor) return "";
 
     const clone = editor.cloneNode(true);
-
     clone.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-      if (checkbox.checked) {
-        checkbox.setAttribute("checked", "checked");
-      } else {
-        checkbox.removeAttribute("checked");
-      }
+      if (checkbox.checked) checkbox.setAttribute("checked", "checked");
+      else checkbox.removeAttribute("checked");
     });
-
     return clone.innerHTML;
   };
 
@@ -62,18 +47,12 @@ function RichTextEditor({ value, onChange, noteId }) {
 
   const insertChecklist = () => {
     editorRef.current?.focus();
-    document.execCommand(
-      "insertHTML",
-      false,
-      '<div class="rich-checklist-item"><input type="checkbox"><span>Checklist item</span></div>'
-    );
+    document.execCommand("insertHTML", false, '<div class="rich-checklist-item"><input type="checkbox"><span>Checklist item</span></div>');
     emitChange();
   };
 
   const handleClick = (event) => {
-    if (event.target.matches('input[type="checkbox"]')) {
-      requestAnimationFrame(emitChange);
-    }
+    if (event.target.matches('input[type="checkbox"]')) requestAnimationFrame(emitChange);
   };
 
   return (
