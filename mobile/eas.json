@@ -11,6 +11,10 @@
     "preview": {
       "distribution": "internal"
     },
+    "github": {
+      "distribution": "internal",
+      "autoIncrement": true
+    },
     "production": {
       "autoIncrement": true
     }
