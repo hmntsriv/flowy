@@ -56,6 +56,9 @@ const startServer = async () => {
     },
   });
 
+  // Make Socket.IO available to REST controllers.
+  app.set("io", io);
+
   io.on("connection", (socket) => {
     try {
       const token = socket.handshake.auth.token;
@@ -65,7 +68,10 @@ const startServer = async () => {
         return;
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET,
+      );
 
       const userId = decoded.userId;
 
@@ -73,26 +79,29 @@ const startServer = async () => {
 
       socket.join(`user:${userId}`);
 
-      console.log(`User ${userId} connected via socket: ${socket.id}`);
-
-      socket.on("note:updated", (note) => {
-        const room = `user:${socket.userId}`;
-
-        socket.to(room).emit("note:updated", note);
-      });
+      console.log(
+        `User ${userId} connected via socket: ${socket.id}`,
+      );
 
       socket.on("disconnect", () => {
-        console.log(`User ${userId} disconnected: ${socket.id}`);
+        console.log(
+          `User ${userId} disconnected: ${socket.id}`,
+        );
       });
     } catch (error) {
-      console.error("Socket authentication failed:", error.message);
+      console.error(
+        "Socket authentication failed:",
+        error.message,
+      );
 
       socket.disconnect();
     }
   });
 
   server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(
+      `Server is running on port ${PORT}`,
+    );
   });
 };
 

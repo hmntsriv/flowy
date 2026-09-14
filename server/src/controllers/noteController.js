@@ -1,5 +1,35 @@
 const Note = require("../models/note");
 
+const emitNoteUpdate = (req, note) => {
+  const io = req.app.get("io");
+
+  if (!io || !note) {
+    return;
+  }
+
+  io.to(`user:${req.user.userId}`).emit(
+    "note:updated",
+    note,
+  );
+};
+
+const emitNoteDeleted = (req, noteId) => {
+  const io = req.app.get("io");
+
+  if (!io || !noteId) {
+    return;
+  }
+
+  io.to(`user:${req.user.userId}`).emit(
+    "note:updated",
+    {
+      _id: noteId,
+      isTrashed: true,
+      permanentlyDeleted: true,
+    },
+  );
+};
+
 // @desc    Get all notes for logged-in user
 // @route   GET /api/notes
 // @access  Private
@@ -84,7 +114,12 @@ const getNoteById = async (req, res) => {
 // @access  Private
 const createNote = async (req, res) => {
   try {
-    const { title, content, type, canvasData } = req.body;
+    const {
+      title,
+      content,
+      type,
+      canvasData,
+    } = req.body;
 
     const note = await Note.create({
       owner: req.user.userId,
@@ -93,6 +128,8 @@ const createNote = async (req, res) => {
       type: type || "text",
       canvasData: canvasData || null,
     });
+
+    emitNoteUpdate(req, note);
 
     res.status(201).json({
       success: true,
@@ -113,15 +150,35 @@ const createNote = async (req, res) => {
 // @access  Private
 const updateNote = async (req, res) => {
   try {
-    const { title, content, type, canvasData, isStarred } = req.body;
+    const {
+      title,
+      content,
+      type,
+      canvasData,
+      isStarred,
+    } = req.body;
 
     const updates = {};
 
-    if (title !== undefined) updates.title = title;
-    if (content !== undefined) updates.content = content;
-    if (type !== undefined) updates.type = type;
-    if (canvasData !== undefined) updates.canvasData = canvasData;
-    if (isStarred !== undefined) updates.isStarred = isStarred;
+    if (title !== undefined) {
+      updates.title = title;
+    }
+
+    if (content !== undefined) {
+      updates.content = content;
+    }
+
+    if (type !== undefined) {
+      updates.type = type;
+    }
+
+    if (canvasData !== undefined) {
+      updates.canvasData = canvasData;
+    }
+
+    if (isStarred !== undefined) {
+      updates.isStarred = isStarred;
+    }
 
     const note = await Note.findOneAndUpdate(
       {
@@ -143,6 +200,8 @@ const updateNote = async (req, res) => {
         message: "Note not found",
       });
     }
+
+    emitNoteUpdate(req, note);
 
     res.status(200).json({
       success: true,
@@ -186,6 +245,8 @@ const deleteNote = async (req, res) => {
       });
     }
 
+    emitNoteUpdate(req, note);
+
     res.status(200).json({
       success: true,
       message: "Note moved to trash",
@@ -202,7 +263,7 @@ const deleteNote = async (req, res) => {
 };
 
 // @desc    Restore note from trash
-// @route   PATCH /api/notes/:id/restore
+// @route   PUT /api/notes/:id/restore
 // @access  Private
 const restoreNote = async (req, res) => {
   try {
@@ -229,6 +290,8 @@ const restoreNote = async (req, res) => {
         message: "Trashed note not found",
       });
     }
+
+    emitNoteUpdate(req, note);
 
     res.status(200).json({
       success: true,
@@ -263,12 +326,17 @@ const permanentlyDeleteNote = async (req, res) => {
       });
     }
 
+    emitNoteDeleted(req, note._id);
+
     res.status(200).json({
       success: true,
       message: "Note permanently deleted",
     });
   } catch (error) {
-    console.error("Failed to permanently delete note:", error);
+    console.error(
+      "Failed to permanently delete note:",
+      error,
+    );
 
     res.status(500).json({
       success: false,
