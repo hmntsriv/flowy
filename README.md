@@ -6,6 +6,8 @@
     <a href="https://flowy-sandy.vercel.app/"><strong>Live Demo</strong></a>
     &nbsp;·&nbsp;
     <a href="https://github.com/hmntsriv/flowy"><strong>Source Code</strong></a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/hmntsriv/flowy/releases/download/v1.0.0/Flowy-v1.0.0.apk"><strong>Download Flowy for Android </strong></a>
   </p>
   <p>
     <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?logo=react&logoColor=white" alt="React + Vite" />
