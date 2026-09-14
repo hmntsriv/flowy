@@ -328,11 +328,6 @@ const handleNewNote = async (type = "text") => {
 
       setSelectedNote(updatedNote);
 
-      socket.emit(
-        "note:updated",
-        updatedNote
-      );
-
       return updatedNote;
     } catch (error) {
       console.error(
@@ -409,10 +404,7 @@ const handleNewNote = async (type = "text") => {
       }
 
       // Tell other tabs
-      socket.emit(
-        "note:updated",
-        trashedNote
-      );
+      
       showToast("Note moved to trash");
     } catch (error) {
       console.error(
@@ -455,10 +447,6 @@ const handleRestoreNote = async (noteId) => {
     setActiveView("notes");
 
     // Tell other tabs
-    socket.emit(
-      "note:updated",
-      restoredNote
-    );
     showToast("Note restored");
   } catch (error) {
   console.error(
