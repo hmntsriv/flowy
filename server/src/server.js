@@ -68,10 +68,7 @@ const startServer = async () => {
         return;
       }
 
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET,
-      );
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       const userId = decoded.userId;
 
@@ -79,29 +76,16 @@ const startServer = async () => {
 
       socket.join(`user:${userId}`);
 
-      console.log(
-        `User ${userId} connected via socket: ${socket.id}`,
-      );
-
-      socket.on("disconnect", () => {
-        console.log(
-          `User ${userId} disconnected: ${socket.id}`,
-        );
-      });
+      socket.on("disconnect", () => {});
     } catch (error) {
-      console.error(
-        "Socket authentication failed:",
-        error.message,
-      );
+      console.error("Socket authentication failed:", error.message);
 
       socket.disconnect();
     }
   });
 
   server.listen(PORT, "0.0.0.0", () => {
-    console.log(
-      `Server is running on port ${PORT}`,
-    );
+    console.log(`Server is running on port ${PORT}`);
   });
 };
 
