@@ -57,7 +57,7 @@ function NoteEditor({ note, onUpdate, onDelete, onDuplicate, onRestore, onPerman
     [canvasSaveTimerRef, titleSaveTimerRef, contentSaveTimerRef].forEach((timerRef) => {
       if (timerRef.current) clearTimeout(timerRef.current);
     });
-  }, [note?._id, isTrashView]);
+  }, [note, isTrashView]);
 
   useEffect(() => {
     if (!moreMenuOpen) return;
