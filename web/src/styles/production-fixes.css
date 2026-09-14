@@ -1,9 +1,5 @@
 /* Flowy editor + mobile fixes */
 
-/* =========================
-   Rich text editor
-   ========================= */
-
 .rich-editor {
   flex: 1;
   min-height: 0;
@@ -29,7 +25,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   min-width: 34px;
   height: 34px;
   padding: 0 9px;
@@ -40,18 +35,11 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
 .rich-editor-tool:hover {
   background: var(--hover-bg);
   color: var(--text-primary);
-}
-
-.rich-editor-tool.active {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  color: #fff;
 }
 
 .rich-editor-separator {
@@ -81,19 +69,10 @@
   pointer-events: none;
 }
 
-.rich-editor-content p {
-  margin: 0 0 10px;
-}
-
+.rich-editor-content p { margin: 0 0 10px; }
 .rich-editor-content ul,
-.rich-editor-content ol {
-  margin: 8px 0 12px;
-  padding-left: 24px;
-}
-
-.rich-editor-content li {
-  margin: 3px 0;
-}
+.rich-editor-content ol { margin: 8px 0 12px; padding-left: 24px; }
+.rich-editor-content li { margin: 3px 0; }
 
 .rich-checklist-item {
   display: flex;
@@ -112,10 +91,7 @@
   cursor: pointer;
 }
 
-.rich-checklist-item span {
-  min-width: 0;
-  flex: 1;
-}
+.rich-checklist-item span { min-width: 0; flex: 1; }
 
 .rich-editor-content blockquote {
   margin: 10px 0;
@@ -124,21 +100,16 @@
   color: var(--color-text-secondary);
 }
 
-.rich-editor-content code {
-  padding: 2px 5px;
-  border-radius: 6px;
+.rich-editor-content pre {
+  padding: 12px;
+  overflow-x: auto;
+  border-radius: 10px;
   background: var(--hover-bg);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.92em;
 }
 
-/* =========================
-   Note filters
-   ========================= */
-
-.note-search-wrapper {
-  position: relative;
-}
+/* Note filters */
+.note-search-wrapper { position: relative; }
 
 .note-filter-menu {
   position: absolute;
@@ -158,7 +129,7 @@
   color: var(--color-text-muted);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.7px;
+  letter-spacing: .7px;
   text-transform: uppercase;
 }
 
@@ -177,25 +148,11 @@
   cursor: pointer;
 }
 
-.note-filter-option:hover {
-  background: var(--hover-bg);
-  color: var(--text-primary);
-}
+.note-filter-option:hover { background: var(--hover-bg); color: var(--text-primary); }
+.note-filter-option.active { background: var(--accent-color); color: #fff; }
+.note-filter-button.active { background: var(--hover-bg); color: var(--accent-color); }
 
-.note-filter-option.active {
-  background: var(--accent-color);
-  color: #fff;
-}
-
-.note-filter-button.active {
-  background: var(--hover-bg);
-  color: var(--accent-color);
-}
-
-/* =========================
-   Mobile canvas toolbar
-   ========================= */
-
+/* Mobile canvas toolbar */
 @media (max-width: 768px) {
   .canvas-toolbar {
     align-items: stretch;
@@ -210,72 +167,33 @@
     flex-wrap: wrap;
   }
 
-  .canvas-tools {
-    justify-content: flex-start;
-  }
+  .canvas-tools { justify-content: flex-start; }
+  .canvas-controls { justify-content: flex-start; gap: 8px; }
+  .canvas-clear-button { margin-left: auto; }
+  .canvas-controls label { min-height: 34px; }
+  .canvas-controls input[type="range"] { width: min(110px, 30vw); }
 
-  .canvas-controls {
-    justify-content: flex-start;
-    gap: 8px;
-  }
+  .rich-editor { margin-top: 24px; }
+  .rich-editor-toolbar { gap: 5px; padding: 7px; }
+  .rich-editor-tool { min-width: 34px; height: 34px; padding: 0 8px; }
+  .rich-editor-content { font-size: 16px; line-height: 1.75; }
 
-  .canvas-clear-button {
-    margin-left: auto;
-  }
-
-  .canvas-controls label {
-    min-height: 34px;
-  }
-
-  .canvas-controls input[type="range"] {
-    width: min(110px, 30vw);
-  }
-
-  .rich-editor {
-    margin-top: 24px;
-  }
-
-  .rich-editor-toolbar {
-    gap: 5px;
-    padding: 7px;
-  }
-
-  .rich-editor-tool {
-    min-width: 34px;
-    height: 34px;
-    padding: 0 8px;
-  }
-
-  .rich-editor-content {
-    font-size: 16px;
-    line-height: 1.75;
-  }
-}
-
-/* Make the mobile sidebar readable instead of excessively transparent. */
-@media (max-width: 768px) {
-  .sidebar-panel.mobile-sidebar-open {
-    background: rgba(248, 250, 252, 0.96);
+  /* The real mobile drawer class is .sidebar. */
+  .sidebar {
+    background: rgba(248, 250, 252, 0.97);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
   }
 
-  [data-theme="dark"] .sidebar-panel.mobile-sidebar-open {
-    background: rgba(24, 30, 42, 0.96);
+  [data-theme="dark"] .sidebar {
+    background: rgba(24, 30, 42, 0.97);
   }
 }
 
-/* Fix profile/account surfaces that referenced missing legacy variables. */
+/* Solid surfaces for portal-based account UI and the canvas toolbar. */
 .profile-panel,
 .account-details-panel,
 .create-note-modal,
 .canvas-toolbar {
-  background: var(--surface);
-}
-
-[data-theme="dark"] .profile-panel,
-[data-theme="dark"] .account-details-panel,
-[data-theme="dark"] .create-note-modal,
-[data-theme="dark"] .canvas-toolbar {
   background: var(--surface);
 }
